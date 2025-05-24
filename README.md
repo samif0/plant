@@ -1,5 +1,4 @@
-# Plant Project
-
+# plant (Prey vs Predator simulation)
 A C++ application using SFML for graphics and the sfsim simulation library for vector operations.
 
 ## Prerequisites
