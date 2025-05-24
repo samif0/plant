@@ -9,35 +9,36 @@ function(set_target_info)
         set(VCPKG_TARGET_TRIPLET "arm64-osx" PARENT_SCOPE)
     elseif(UNIX AND NOT APPLE)
         set(TARGET_OS "linux" PARENT_SCOPE)
-        set(TARGET_ARCH "x86" PARENT_SCOPE)
-        set(VCPKG_TARGET_TRIPLET "x86-linux" PARENT_SCOPE)
+        set(TARGET_ARCH "x64" PARENT_SCOPE)
+        set(VCPKG_TARGET_TRIPLET "x64-linux" PARENT_SCOPE)
     endif()
 endfunction()
 
 cmake_minimum_required(VERSION 3.15)
-project(plant)
 
-
+# Set vcpkg toolchain before project() call
 if(DEFINED ENV{VCPKG_ROOT})
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-    
-    # Explicitly set SFML_DIR based on your platform
-    if(WIN32)
-        set(SFML_DIR "$ENV{VCPKG_ROOT}/installed/x64-windows/share/sfml" CACHE PATH "")
-    elseif(APPLE)
-        set(SFML_DIR "$ENV{VCPKG_ROOT}/installed/arm64-osx/share/sfml" CACHE PATH "")
-    else() # Linux
-        set(SFML_DIR "$ENV{VCPKG_ROOT}/installed/x64-linux/share/sfml" CACHE PATH "")
-    endif()
-    
-    # Make sure this gets passed to any subdirectories
-    set(SFML_DIR "${SFML_DIR}" CACHE PATH "" FORCE)
-    message(STATUS "Set SFML_DIR to: ${SFML_DIR}")
 else()
     message(FATAL_ERROR "VCPKG_ROOT environment variable is not set")
 endif()
 
+project(plant)
+
 set_target_info()
+
+# Explicitly set SFML_DIR based on your platform
+if(WIN32)
+    set(SFML_DIR "$ENV{VCPKG_ROOT}/installed/x64-windows/share/sfml" CACHE PATH "")
+elseif(APPLE)
+    set(SFML_DIR "$ENV{VCPKG_ROOT}/installed/arm64-osx/share/sfml" CACHE PATH "")
+else() # Linux
+    set(SFML_DIR "$ENV{VCPKG_ROOT}/installed/x64-linux/share/sfml" CACHE PATH "")
+endif()
+
+set(SFML_DIR "${SFML_DIR}" CACHE PATH "" FORCE)
+message(STATUS "Set SFML_DIR to: ${SFML_DIR}")
+
 set(VCPKG_TARGET_TRIPLET "${TARGET_ARCH}-${TARGET_OS}" CACHE STRING "")
 set(VCPKG_MANIFEST_DIR ${CMAKE_SOURCE_DIR})
 
@@ -51,9 +52,8 @@ file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 find_package(SFML COMPONENTS Network Graphics Window Audio System CONFIG REQUIRED)
 
-# Add sfsim math library (header-only components)
-add_library(sfsim_math INTERFACE)
-target_include_directories(sfsim_math INTERFACE "${CMAKE_SOURCE_DIR}/external/sfsim/include")
+add_library(sfsim INTERFACE)
+target_include_directories(sfsim INTERFACE "${CMAKE_SOURCE_DIR}/external/sfsim/include")
 
 # Build your executable
 add_executable(plant ${SOURCES})
@@ -63,5 +63,5 @@ target_link_libraries(plant PRIVATE
     SFML::Window 
     SFML::Audio 
     SFML::System
-    sfsim_math  # Link to sfsim math headers
+    sfsim  
 )
