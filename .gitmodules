@@ -1,0 +1,3 @@
+[submodule "external/sfsim"]
+	path = external/sfsim
+	url = git@github.com:samif0/sfsim.git

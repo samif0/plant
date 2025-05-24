@@ -51,30 +51,9 @@ file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 find_package(SFML COMPONENTS Network Graphics Window Audio System CONFIG REQUIRED)
 
-include(FetchContent)
-# First declare and make available the sfsim content
-FetchContent_Declare(
-    sfsim
-    GIT_REPOSITORY https://github.com/samif0/sfsim.git
-    GIT_TAG main
-)
-FetchContent_MakeAvailable(sfsim)
-FetchContent_GetProperties(sfsim)
-
-file(GLOB SFSIM_LIB_SOURCES "${sfsim_SOURCE_DIR}/src/*.cpp")
-# Remove main.cpp from the sources since that contains the main() function
-list(FILTER SFSIM_LIB_SOURCES EXCLUDE REGEX ".*main.cpp$")
-
-# Create a static library target
-add_library(sfsim_lib STATIC ${SFSIM_LIB_SOURCES})
-target_include_directories(sfsim_lib PUBLIC "${sfsim_SOURCE_DIR}/include")
-
-# Link SFML to the library
-target_link_libraries(sfsim_lib PUBLIC 
-    SFML::Graphics 
-    SFML::Window 
-    SFML::System
-)
+# Add sfsim math library (header-only components)
+add_library(sfsim_math INTERFACE)
+target_include_directories(sfsim_math INTERFACE "${CMAKE_SOURCE_DIR}/external/sfsim/include")
 
 # Build your executable
 add_executable(plant ${SOURCES})
@@ -84,5 +63,5 @@ target_link_libraries(plant PRIVATE
     SFML::Window 
     SFML::Audio 
     SFML::System
-    sfsim_lib  # Link to our library, not sfsim
+    sfsim_math  # Link to sfsim math headers
 )
