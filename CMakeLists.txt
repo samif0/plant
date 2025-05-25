@@ -46,14 +46,39 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Generate compile_commands.json for language servers and IDEs
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 find_package(SFML COMPONENTS Network Graphics Window Audio System CONFIG REQUIRED)
 
-add_library(sfsim INTERFACE)
-target_include_directories(sfsim INTERFACE "${CMAKE_SOURCE_DIR}/external/sfsim/include")
+# Build sfsim as a static library - only include the files that are actually used
+set(SFSIM_SOURCES 
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/simple_examples.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/examples.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/sim.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/camera.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/transform.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/core/time.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/renderer/material.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/ecs/entity.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/ecs/transform_component.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/ecs/render_component.cpp
+    ${CMAKE_SOURCE_DIR}/external/sfsim/src/geometry/mesh.cpp
+)
+
+add_library(sfsim STATIC ${SFSIM_SOURCES})
+target_include_directories(sfsim PUBLIC "${CMAKE_SOURCE_DIR}/external/sfsim/include")
+target_link_libraries(sfsim PUBLIC 
+    SFML::Network 
+    SFML::Graphics 
+    SFML::Window 
+    SFML::Audio 
+    SFML::System
+)
 
 # Build your executable
 add_executable(plant ${SOURCES})

@@ -82,6 +82,16 @@ make
 
 ```
 
+### Compile Commands for IDE Support
+
+The project automatically generates `compile_commands.json` in the build directory for IDE/language server support. After building, copy it to the project root:
+
+```bash
+cp build/compile_commands.json .
+```
+
+This enables code completion, error highlighting, and navigation in most editors.
+
 ## Project Structure
 
 ```
