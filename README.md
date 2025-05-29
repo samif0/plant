@@ -11,6 +11,14 @@ You'll need these tools installed on your system:
 4. **C++ Compiler** with C++17 support
 5. **Development Environment** - Any IDE/editor that supports CMake
 
+
+Some dependencies you may need installed:
+
+```
+git curl zip unzip tar pkg-config
+libx11-dev libxi-dev libxrandr-dev libxcursor-dev libxi-dev libudev-dev libgl1-mesa-dev
+```
+
 ## Setup Instructions
 
 ### Step 1: Clone the Repository
